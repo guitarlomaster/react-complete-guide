@@ -23,20 +23,30 @@ export const authFail = (error) => {
 };
 
 export const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('expirationDate');
-    localStorage.removeItem('userId');
+    // localStorage.removeItem('token');
+    // localStorage.removeItem('expirationDate');
+    // localStorage.removeItem('userId');
+    return {
+        type: actionTypes.AUTH_INITIATE_LOGOUT
+    }
+};
+
+export const logoutSucceed = () => {
     return {
         type: actionTypes.AUTH_LOGOUT
     }
 };
 
 export const checkAuthTimeout = (expirationTime) => {
-    return dispatch => {
-        setTimeout(() => {
-            dispatch(logout());
-        }, expirationTime * 1000);
-    };
+    // return dispatch => {
+    //     setTimeout(() => {
+    //         dispatch(logout());
+    //     }, expirationTime * 1000);
+    // };
+    return {
+        type: actionTypes.AUTH_CHECK_TIMEOUT,
+        expirationTime: expirationTime
+    }
 };
 
 export const setAuthRedirectPath = (path) => {
@@ -47,33 +57,11 @@ export const setAuthRedirectPath = (path) => {
 };
 
 export const auth = (email, password, isSignup) => {
-    return dispatch => {
-        dispatch(authStart());
-        const authData = {
-            email: email,
-            password: password,
-            returnSecureToken: true
-        };
-        let url = 'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCo6o7Ezbjb6cJnmyOoh5BX35Jcr0NEo8g';
-        if (!isSignup) {
-            url = 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCo6o7Ezbjb6cJnmyOoh5BX35Jcr0NEo8g';
-        }
-        axios.post(url, authData)
-            .then(res => {
-                const expirationDate = new Date(new Date().getTime() + res.data.expiresIn * 1000);
-                localStorage.setItem('token', res.data.idToken);
-                localStorage.setItem('expirationDate', expirationDate);
-                localStorage.setItem('userId', res.data.localId);
-                dispatch(authSuccess(res.data.idToken, res.data.localId));
-                dispatch(checkAuthTimeout(res.data.expiresIn));
-            })
-            .catch(err => {
-                const newErrObj = {
-                    ...err.response.data.error,
-                    message: getErrorMessageFromCode(err.response.data.error.message)
-                };
-                dispatch(authFail(newErrObj));
-            })
+    return {
+        type: actionTypes.AUTH_USER,
+        email: email,
+        password: password,
+        isSignup: isSignup
     }
 };
 
