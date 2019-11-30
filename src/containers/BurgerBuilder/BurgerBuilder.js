@@ -15,17 +15,20 @@ const burgerBuilder = props => {
 
     const [purchasing, setPurchasing] = useState(false);
 
-    const ings = useSelector(state => state.burgerBuilder.ingredients);
-    const price = useSelector(state => state.burgerBuilder.totalPrice);
-    const error = useSelector(state => state.burgerBuilder.error);
-    const isAuthenticated = useSelector(state => state.auth.token !== null);
+    const ings = useSelector(state => state.burgerBuilder.ingredients),
+        price = useSelector(state => state.burgerBuilder.totalPrice),
+        error = useSelector(state => state.burgerBuilder.error),
+        isAuthenticated = useSelector(state => state.auth.token !== null);
 
     const dispatch = useDispatch();
-    const onIngredientAdded = (ingName) => dispatch(actions.addIngredient(ingName));
-    const onIngredientRemoved = (ingName) => dispatch(actions.removeIngredient(ingName));
-    const onInitIngredients = useCallback(() => dispatch(actions.initIngredients()), [dispatch]);
-    const onInitPurchase = () => dispatch(actions.purchaseInit());
-    const onSetAuthRedirectPath = (path) => dispatch(actions.setAuthRedirectPath(path));
+    const onIngredientAdded = (ingName) => dispatch(actions.addIngredient(ingName)),
+        onIngredientRemoved = (ingName) => dispatch(actions.removeIngredient(ingName)),
+        onInitIngredients = useCallback(
+            () => dispatch(actions.initIngredients()),
+            [dispatch]
+        ),
+        onInitPurchase = () => dispatch(actions.purchaseInit()),
+        onSetAuthRedirectPath = (path) => dispatch(actions.setAuthRedirectPath(path));
 
     useEffect(() => {
         onInitIngredients();
