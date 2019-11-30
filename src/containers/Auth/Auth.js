@@ -1,6 +1,6 @@
-import React, {useState, useEffect} from 'react';
-import { connect } from 'react-redux';
-import { Redirect } from 'react-router-dom'
+import React, {useState, useEffect, useCallback} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {Redirect} from 'react-router-dom'
 
 import Input from '../../components/UI/Input/Input';
 import Button from '../../components/UI/Button/Button';
@@ -41,7 +41,19 @@ const auth = props => {
         },
     });
     const [isSignup, setIsSignup] = useState(true);
-    const {buildingBurger, authRedirectPath, onSetAuthRedirectPath} = props;
+
+    const loading = useSelector(state => state.auth.loading),
+        error = useSelector(state => state.auth.error),
+        isAuthenticated = useSelector(state => state.auth.token !== null),
+        buildingBurger = useSelector(state => state.burgerBuilder.building),
+        authRedirectPath = useSelector(state => state.auth.authRedirectPath);
+
+    const dispatch = useDispatch();
+    const onAuth = (email, password, isSignup) => dispatch(actions.auth(email, password, isSignup)),
+        onSetAuthRedirectPath = useCallback(
+            () => dispatch(actions.setAuthRedirectPath('/')),
+            [dispatch]
+        );
 
     useEffect(() => {
         if (!buildingBurger && authRedirectPath !== '/') {
@@ -62,7 +74,7 @@ const auth = props => {
 
     const submitHandler = (event) => {
         event.preventDefault();
-        props.onAuth(authForm.email.value, authForm.password.value, isSignup);
+        onAuth(authForm.email.value, authForm.password.value, isSignup);
     };
 
     const switchAuthModeHandler = () => {
@@ -90,20 +102,20 @@ const auth = props => {
         />
     ));
 
-    if (props.loading) {
+    if (loading) {
         form = <Spinner/>;
     }
 
     let errorMessage = null;
-    if (props.error) {
+    if (error) {
         errorMessage = (
-            <p className={classes['Error']}>{props.error.message}</p>
+            <p className={classes['Error']}>{error.message}</p>
         )
     }
 
     let authRedirect = null;
-    if (props.isAuthenticated) {
-        authRedirect = <Redirect to={props.authRedirectPath} />
+    if (isAuthenticated) {
+        authRedirect = <Redirect to={props.authRedirectPath}/>
     }
 
     return (
@@ -117,27 +129,10 @@ const auth = props => {
             <Button
                 btnType="Danger"
                 clicked={switchAuthModeHandler}
-            >SWITCH TO {isSignup ? 'SIGNIN': 'SIGNUP'}</Button>
+            >SWITCH TO {isSignup ? 'SIGNIN' : 'SIGNUP'}</Button>
         </div>
     );
 
 };
 
-const mapStateToProps = state => {
-    return {
-        loading: state.auth.loading,
-        error: state.auth.error,
-        isAuthenticated: state.auth.token !== null,
-        buildingBurger: state.burgerBuilder.building,
-        authRedirectPath: state.auth.authRedirectPath
-    }
-};
-
-const mapDispatchToProps = dispatch => {
-    return {
-        onAuth: (email, password, isSignup) => dispatch(actions.auth(email, password, isSignup)),
-        onSetAuthRedirectPath: () => dispatch(actions.setAuthRedirectPath('/'))
-    }
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(auth);
+export default auth;
