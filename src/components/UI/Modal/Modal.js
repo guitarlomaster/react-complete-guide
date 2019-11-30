@@ -5,11 +5,6 @@ import Aux from '../../../hoc/Auxiliary/Auxiliary';
 import Backdrop from '../Backdrop/Backdrop';
 
 const modal = props => {
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     return nextProps.show !== props.show || nextProps.children !== props.children;
-    // }
-
-
 
     return (
         <Aux>
